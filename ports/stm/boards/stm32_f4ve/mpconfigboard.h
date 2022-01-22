@@ -50,8 +50,8 @@
     #define BOARD_VTOR_DEFER (1) // Leave VTOR relocation to bootloader
 #endif
 
-#define DEFAULT_I2C_BUS_SCL         (&pin_PB08)
-#define DEFAULT_I2C_BUS_SDA         (&pin_PB09)
+#define DEFAULT_I2C_BUS_SCL         (&pin_PB10)
+#define DEFAULT_I2C_BUS_SDA         (&pin_PB11)
 
 #define DEFAULT_SPI_BUS_SCK         (&pin_PB13)
 #define DEFAULT_SPI_BUS_MOSI        (&pin_PB15)
