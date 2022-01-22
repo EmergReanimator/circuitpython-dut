@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Scott Shawcroft for Adafruit Industries
+ * Copyright (c) 2021 microDev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,24 @@
  * THE SOFTWARE.
  */
 
-// Micropython setup
+// Board setup
+#define MICROPY_HW_BOARD_NAME       "ESP32-C3-DevKitM-1"
+#define MICROPY_HW_MCU_NAME         "ESP32-C3N4"
 
-#define MICROPY_HW_BOARD_NAME       "ESP32-S3-DevKitC-1-nopsram"
-#define MICROPY_HW_MCU_NAME         "ESP32S3"
+// Status LED
+#define MICROPY_HW_NEOPIXEL         (&pin_GPIO8)
+#define MICROPY_HW_NEOPIXEL_COUNT   (1)
 
-#define MICROPY_HW_NEOPIXEL (&pin_GPIO48)
+// Default bus pins
+#define DEFAULT_UART_BUS_RX         (&pin_GPIO20)
+#define DEFAULT_UART_BUS_TX         (&pin_GPIO21)
 
-#define CIRCUITPY_BOOT_BUTTON (&pin_GPIO0)
+// Serial over UART
+#define DEBUG_UART_RX               DEFAULT_UART_BUS_RX
+#define DEBUG_UART_TX               DEFAULT_UART_BUS_TX
 
+// For entering safe mode
+#define CIRCUITPY_BOOT_BUTTON       (&pin_GPIO2)
+
+// Explanation of how a user got into safe mode
 #define BOARD_USER_SAFE_MODE_ACTION translate("pressing boot button at start up.\n")
-
-#define AUTORESET_DELAY_MS 500

@@ -290,10 +290,10 @@ STATIC void cleanup_after_vm(supervisor_allocation *heap, mp_obj_t exception) {
     keypad_reset();
     #endif
 
-    // reset_board_busses() first because it may release pins from the never_reset state, so that
+    // reset_board_buses() first because it may release pins from the never_reset state, so that
     // reset_port() can reset them.
     #if CIRCUITPY_BOARD
-    reset_board_busses();
+    reset_board_buses();
     #endif
     reset_port();
     reset_board();
@@ -812,9 +812,10 @@ int __attribute__((used)) main(void) {
     // A power brownout here could make it appear as if there's
     // no SPI flash filesystem, and we might erase the existing one.
 
-    // Check whether CIRCUITPY is available. Don't check if it already hasn't been found.
-    if ((safe_mode != NO_CIRCUITPY) && !filesystem_init(safe_mode == NO_SAFE_MODE, false)) {
-        reset_into_safe_mode(NO_CIRCUITPY);
+    // Check whether CIRCUITPY is available. No need to reset to get safe mode
+    // since we haven't run user code yet.
+    if (!filesystem_init(safe_mode == NO_SAFE_MODE, false)) {
+        safe_mode = NO_CIRCUITPY;
     }
 
     // displays init after filesystem, since they could share the flash SPI
@@ -837,7 +838,7 @@ int __attribute__((used)) main(void) {
     // By default our internal flash is readonly to local python code and
     // writable over USB. Set it here so that boot.py can change it.
     filesystem_set_internal_concurrent_write_protection(true);
-    filesystem_set_internal_writable_by_usb(true);
+    filesystem_set_internal_writable_by_usb(CIRCUITPY_USB == 1);
 
     run_boot_py(safe_mode);
 

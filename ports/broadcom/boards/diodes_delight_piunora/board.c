@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2020 Scott Shawcroft for Adafruit Industries
+ * Copyright (c) 2021 Scott Shawcroft for Adafruit Industries
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,27 +26,23 @@
 
 #include "supervisor/board.h"
 #include "mpconfigboard.h"
-#include "shared-bindings/microcontroller/Pin.h"
+
+#include "bindings/videocore/Framebuffer.h"
+#include "shared-module/displayio/__init__.h"
+#include "shared-bindings/framebufferio/FramebufferDisplay.h"
 
 void board_init(void) {
-    // USB
-    common_hal_never_reset_pin(&pin_GPIO19);
-    common_hal_never_reset_pin(&pin_GPIO20);
+    videocore_framebuffer_obj_t *fb = &allocate_display_bus()->videocore;
+    fb->base.type = &videocore_framebuffer_type;
+    common_hal_videocore_framebuffer_construct(fb, 640, 480);
 
-    // Debug UART
-    #ifdef DEBUG
-    common_hal_never_reset_pin(&pin_GPIO43);
-    common_hal_never_reset_pin(&pin_GPIO44);
-    #endif
-
-    // SPI Flash and RAM
-    common_hal_never_reset_pin(&pin_GPIO26);
-    common_hal_never_reset_pin(&pin_GPIO27);
-    common_hal_never_reset_pin(&pin_GPIO28);
-    common_hal_never_reset_pin(&pin_GPIO29);
-    common_hal_never_reset_pin(&pin_GPIO30);
-    common_hal_never_reset_pin(&pin_GPIO31);
-    common_hal_never_reset_pin(&pin_GPIO32);
+    framebufferio_framebufferdisplay_obj_t *display = &displays[0].framebuffer_display;
+    display->base.type = &framebufferio_framebufferdisplay_type;
+    common_hal_framebufferio_framebufferdisplay_construct(
+        display,
+        MP_OBJ_FROM_PTR(fb),
+        0,
+        true);
 }
 
 bool board_requests_safe_mode(void) {
@@ -54,7 +50,6 @@ bool board_requests_safe_mode(void) {
 }
 
 void reset_board(void) {
-
 }
 
 void board_deinit(void) {

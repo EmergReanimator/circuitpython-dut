@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Scott Shawcroft for Adafruit Industries
+ * Copyright (c) 2021 Scott Shawcroft for Adafruit Industries
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,33 @@
  * THE SOFTWARE.
  */
 
-// Micropython setup
+#include "supervisor/board.h"
+#include "mpconfigboard.h"
 
-#define MICROPY_HW_BOARD_NAME       "ESP32-S3-DevKitC-1"
-#define MICROPY_HW_MCU_NAME         "ESP32S3"
+#include "bindings/videocore/Framebuffer.h"
+#include "shared-module/displayio/__init__.h"
+#include "shared-bindings/framebufferio/FramebufferDisplay.h"
 
-#define MICROPY_HW_NEOPIXEL (&pin_GPIO48)
+void board_init(void) {
+    videocore_framebuffer_obj_t *fb = &allocate_display_bus()->videocore;
+    fb->base.type = &videocore_framebuffer_type;
+    common_hal_videocore_framebuffer_construct(fb, 640, 480);
 
-#define CIRCUITPY_BOOT_BUTTON (&pin_GPIO0)
+    framebufferio_framebufferdisplay_obj_t *display = &displays[0].framebuffer_display;
+    display->base.type = &framebufferio_framebufferdisplay_type;
+    common_hal_framebufferio_framebufferdisplay_construct(
+        display,
+        MP_OBJ_FROM_PTR(fb),
+        0,
+        true);
+}
 
-#define BOARD_USER_SAFE_MODE_ACTION translate("pressing boot button at start up.\n")
+bool board_requests_safe_mode(void) {
+    return false;
+}
 
-#define AUTORESET_DELAY_MS 500
+void reset_board(void) {
+}
+
+void board_deinit(void) {
+}
