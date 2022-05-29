@@ -165,13 +165,13 @@ STATIC int check_pins(busio_spi_obj_t *self,
     if (spi_taken) {
         mp_raise_ValueError(translate("Hardware busy, try alternative pins"));
     } else {
-        mp_raise_ValueError_varg(translate("Invalid %q pin selection"), MP_QSTR_SPI);
+        raise_ValueError_invalid_pin();
     }
 }
 
 void common_hal_busio_spi_construct(busio_spi_obj_t *self,
     const mcu_pin_obj_t *sck, const mcu_pin_obj_t *mosi,
-    const mcu_pin_obj_t *miso) {
+    const mcu_pin_obj_t *miso, bool half_duplex) {
 
     int periph_index = check_pins(self, sck, mosi, miso);
     SPI_TypeDef *SPIx = mcu_spi_banks[periph_index - 1];
@@ -209,7 +209,11 @@ void common_hal_busio_spi_construct(busio_spi_obj_t *self,
     self->handle.Instance = SPIx;
     self->handle.Init.Mode = SPI_MODE_MASTER;
     // Direction change only required for RX-only, see RefMan RM0090:884
-    self->handle.Init.Direction = (self->mosi == NULL) ? SPI_DIRECTION_2LINES_RXONLY : SPI_DIRECTION_2LINES;
+    if (half_duplex) {
+        self->handle.Init.Direction = SPI_DIRECTION_1LINE;
+    } else {
+        self->handle.Init.Direction = (self->mosi == NULL) ? SPI_DIRECTION_2LINES_RXONLY : SPI_DIRECTION_2LINES;
+    }
     self->handle.Init.DataSize = SPI_DATASIZE_8BIT;
     self->handle.Init.CLKPolarity = SPI_POLARITY_LOW;
     self->handle.Init.CLKPhase = SPI_PHASE_1EDGE;
@@ -220,10 +224,11 @@ void common_hal_busio_spi_construct(busio_spi_obj_t *self,
     self->handle.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
     self->handle.Init.CRCPolynomial = 10;
     if (HAL_SPI_Init(&self->handle) != HAL_OK) {
-        mp_raise_ValueError(translate("SPI Init Error"));
+        mp_raise_ValueError(translate("SPI init error"));
     }
     self->baudrate = (get_busclock(SPIx) / 16);
     self->prescaler = 16;
+    self->half_duplex = half_duplex;
     self->polarity = 0;
     self->phase = 0;
     self->bits = 8;
@@ -288,11 +293,20 @@ bool common_hal_busio_spi_configure(busio_spi_obj_t *self,
     self->handle.Init.CLKPolarity = (polarity) ? SPI_POLARITY_HIGH : SPI_POLARITY_LOW;
     self->handle.Init.CLKPhase = (phase) ? SPI_PHASE_2EDGE : SPI_PHASE_1EDGE;
 
+    // Set SCK pull up or down based on SPI CLK Polarity
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = pin_mask(self->sck->pin->number);
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = (polarity) ? GPIO_PULLUP : GPIO_PULLDOWN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = self->sck->altfn_index;
+    HAL_GPIO_Init(pin_port(self->sck->pin->port), &GPIO_InitStruct);
+
     self->handle.Init.BaudRatePrescaler = stm32_baud_to_spi_div(baudrate, &self->prescaler,
         get_busclock(self->handle.Instance));
 
     if (HAL_SPI_Init(&self->handle) != HAL_OK) {
-        mp_raise_ValueError(translate("SPI Re-initialization error"));
+        mp_raise_RuntimeError(translate("SPI re-init"));
     }
 
     self->baudrate = baudrate;
@@ -332,7 +346,7 @@ void common_hal_busio_spi_unlock(busio_spi_obj_t *self) {
 bool common_hal_busio_spi_write(busio_spi_obj_t *self,
     const uint8_t *data, size_t len) {
     if (self->mosi == NULL) {
-        mp_raise_ValueError(translate("No MOSI Pin"));
+        mp_raise_ValueError(translate("No MOSI pin"));
     }
     HAL_StatusTypeDef result = HAL_SPI_Transmit(&self->handle, (uint8_t *)data, (uint16_t)len, HAL_MAX_DELAY);
     return result == HAL_OK;
@@ -340,11 +354,13 @@ bool common_hal_busio_spi_write(busio_spi_obj_t *self,
 
 bool common_hal_busio_spi_read(busio_spi_obj_t *self,
     uint8_t *data, size_t len, uint8_t write_value) {
-    if (self->miso == NULL) {
-        mp_raise_ValueError(translate("No MISO Pin"));
+    if (self->miso == NULL && !self->half_duplex) {
+        mp_raise_ValueError(translate("No MISO pin"));
+    } else if (self->half_duplex && self->mosi == NULL) {
+        mp_raise_ValueError(translate("No MOSI pin"));
     }
     HAL_StatusTypeDef result = HAL_OK;
-    if (self->mosi == NULL) {
+    if ((!self->half_duplex && self->mosi == NULL) || (self->half_duplex && self->mosi != NULL && self->miso == NULL)) {
         result = HAL_SPI_Receive(&self->handle, data, (uint16_t)len, HAL_MAX_DELAY);
     } else {
         memset(data, write_value, len);
@@ -356,7 +372,7 @@ bool common_hal_busio_spi_read(busio_spi_obj_t *self,
 bool common_hal_busio_spi_transfer(busio_spi_obj_t *self,
     const uint8_t *data_out, uint8_t *data_in, size_t len) {
     if (self->miso == NULL || self->mosi == NULL) {
-        mp_raise_ValueError(translate("Missing MISO or MOSI Pin"));
+        mp_raise_ValueError(translate("Missing MISO or MOSI pin"));
     }
     HAL_StatusTypeDef result = HAL_SPI_TransmitReceive(&self->handle,
         (uint8_t *)data_out, data_in, (uint16_t)len,HAL_MAX_DELAY);

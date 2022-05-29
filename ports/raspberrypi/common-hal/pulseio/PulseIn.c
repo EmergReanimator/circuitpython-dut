@@ -49,7 +49,7 @@ void common_hal_pulseio_pulsein_construct(pulseio_pulsein_obj_t *self,
 
     self->buffer = (uint16_t *)m_malloc(maxlen * sizeof(uint16_t), false);
     if (self->buffer == NULL) {
-        mp_raise_msg_varg(&mp_type_MemoryError, translate("Failed to allocate RX buffer of %d bytes"), maxlen * sizeof(uint16_t));
+        m_malloc_fail(maxlen * sizeof(uint16_t));
     }
     self->pin = pin->number;
     self->maxlen = maxlen;
@@ -74,7 +74,8 @@ void common_hal_pulseio_pulsein_construct(pulseio_pulsein_obj_t *self,
             true, 32, true, // RX auto-push every 32 bits
             false, // claim pins
             false, // Not user-interruptible.
-            false); // No sideset enable
+            false, // No sideset enable
+            0, -1); // wrap settings
 
     if (!ok) {
         mp_raise_RuntimeError(translate("All state machines in use"));
@@ -146,9 +147,12 @@ void common_hal_pulseio_pulsein_interrupt(void *self_in) {
                 }
                 // return  pulses that are not too short
                 if (result > MIN_PULSE) {
-                    self->buffer[self->buf_index] = (uint16_t)result;
+                    size_t buf_index = (self->start + self->len) % self->maxlen;
+                    self->buffer[buf_index] = (uint16_t)result;
                     if (self->len < self->maxlen) {
                         self->len++;
+                    } else {
+                        self->start = (self->start + 1) % self->maxlen;
                     }
                     if (self->buf_index < self->maxlen) {
                         self->buf_index++;
@@ -168,7 +172,6 @@ void common_hal_pulseio_pulsein_interrupt(void *self_in) {
         pio_sm_restart(self->state_machine.pio,self->state_machine.state_machine);
         pio_sm_set_enabled(self->state_machine.pio, self->state_machine.state_machine, true);
         self->buf_index = 0;
-        self->start = 0;
     }
 }
 void common_hal_pulseio_pulsein_resume(pulseio_pulsein_obj_t *self,
@@ -234,7 +237,7 @@ uint16_t common_hal_pulseio_pulsein_get_item(pulseio_pulsein_obj_t *self,
         index += self->len;
     }
     if (index < 0 || index >= self->len) {
-        mp_raise_IndexError_varg(translate("%q index out of range"), MP_QSTR_PulseIn);
+        mp_arg_validate_index_range(index, 0, self->len, MP_QSTR_index);
     }
     uint16_t value = self->buffer[(self->start + index) % self->maxlen];
     return value;

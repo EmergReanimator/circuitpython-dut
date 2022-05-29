@@ -124,7 +124,7 @@ $(echo PERIPHERALS_CHIP_FAMILY=$(PERIPHERALS_CHIP_FAMILY))
 ifeq ($(DEBUG), 1)
   CFLAGS += -ggdb3 -Og -Os
   # You may want to disable -flto if it interferes with debugging.
-  CFLAGS += -flto -flto-partition=none
+  CFLAGS += -flto -flto-partition=one
   # You may want to enable these flags to make setting breakpoints easier.
   # CFLAGS += -fno-inline -fno-ipa-sra
   ifeq ($(CHIP_FAMILY), samd21)
@@ -147,10 +147,11 @@ else
     CFLAGS += -finline-limit=$(CFLAGS_INLINE_LIMIT)
   endif
 
-  CFLAGS += -flto -flto-partition=none
+  CFLAGS += -flto
 
   ifeq ($(CIRCUITPY_FULL_BUILD),0)
     CFLAGS += --param inline-unit-growth=15 --param max-inline-insns-auto=20
+    CFLAGS += -flto-partition=one
   endif
 
   ifdef CFLAGS_BOARD
@@ -167,7 +168,8 @@ CFLAGS += \
 	-mcpu=cortex-m0plus \
 	-msoft-float \
 	-mfloat-abi=soft \
-	-DSAMD21
+	-DSAMD21 \
+	-flto-partition=one
 endif
 ifeq ($(CHIP_FAMILY), samd51)
 CFLAGS += \
@@ -197,7 +199,11 @@ CFLAGS += \
 	-DSAM_D5X_E5X -DSAME51
 endif
 
-
+# GCC 11 adds stringop bounds checks that trigger when writing a memory region
+# we know is ok. It's not clear how to give the compiler the info it needs so
+# disable the checks for now.
+# See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99578
+CFLAGS += -Wno-stringop-overread -Wno-stringop-overflow
 
 LDFLAGS = $(CFLAGS) -nostartfiles -Wl,-nostdlib -Wl,-T,$(GENERATED_LD_FILE) -Wl,-Map=$@.map -Wl,-cref -Wl,-gc-sections -specs=nano.specs
 LDFLAGS += -flto=$(shell $(NPROC))
@@ -315,13 +321,10 @@ $(patsubst %.c,$(BUILD)/%.o,$(SRC_PERIPHERALS)): CFLAGS += -Wno-missing-prototyp
 SRC_C += \
 	audio_dma.c \
 	background.c \
-	bindings/samd/Clock.c \
-	bindings/samd/__init__.c \
 	boards/$(BOARD)/board.c \
 	boards/$(BOARD)/pins.c \
 	eic_handler.c \
 	fatfs_port.c \
-	freetouch/adafruit_ptc.c \
 	lib/tinyusb/src/portable/microchip/samd/dcd_samd.c \
 	mphalport.c \
 	reset.c \
@@ -336,8 +339,16 @@ ifneq (,$(filter 1,$(CIRCUITPY_PWMIO) $(CIRCUITPY_AUDIOIO) $(CIRCUITPY_RGBMATRIX
 SRC_C += shared_timers.c
 endif
 
+ifeq ($(CIRCUITPY_SAMD),1)
+SRC_C += bindings/samd/Clock.c bindings/samd/__init__.c
+endif
+
 ifeq ($(CIRCUITPY_SDIOIO),1)
 SRC_C += ports/atmel-samd/sd_mmc/sd_mmc.c
+endif
+
+ifeq ($(CIRCUITPY_TOUCHIO),1)
+SRC_C += freetouch/adafruit_ptc.c
 endif
 
 # The smallest SAMD51 packages don't have I2S. Everything else does.

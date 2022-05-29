@@ -87,6 +87,7 @@ extern void common_hal_mcu_enable_interrupts(void);
 #define MICROPY_OPT_COMPUTED_GOTO        (1)
 #define MICROPY_OPT_COMPUTED_GOTO_SAVE_SPACE (CIRCUITPY_COMPUTED_GOTO_SAVE_SPACE)
 #define MICROPY_OPT_LOAD_ATTR_FAST_PATH  (CIRCUITPY_OPT_LOAD_ATTR_FAST_PATH)
+#define MICROPY_OPT_MAP_LOOKUP_CACHE  (CIRCUITPY_OPT_MAP_LOOKUP_CACHE)
 #define MICROPY_OPT_CACHE_MAP_LOOKUP_IN_BYTECODE (CIRCUITPY_OPT_CACHE_MAP_LOOKUP_IN_BYTECODE)
 #define MICROPY_PERSISTENT_CODE_LOAD     (1)
 
@@ -212,7 +213,7 @@ typedef long mp_off_t;
 #define MICROPY_CPYTHON_COMPAT                (CIRCUITPY_FULL_BUILD)
 #endif
 #define MICROPY_PY_BUILTINS_POW3              (CIRCUITPY_BUILTINS_POW3)
-#define MICROPY_PY_FSTRINGS                   (MICROPY_CPYTHON_COMPAT)
+#define MICROPY_PY_FSTRINGS                   (1)
 #define MICROPY_MODULE_WEAK_LINKS             (0)
 #define MICROPY_PY_ALL_SPECIAL_METHODS        (CIRCUITPY_FULL_BUILD)
 #ifndef MICROPY_PY_BUILTINS_COMPLEX
@@ -308,14 +309,6 @@ typedef long mp_off_t;
 #else
 #define CIRCUITPY_DISPLAY_LIMIT (0)
 #define CIRCUITPY_DISPLAY_AREA_BUFFER_SIZE (0)
-#endif
-
-#if CIRCUITPY_GAMEPADSHIFT
-// Scan gamepad every 32ms
-#define CIRCUITPY_GAMEPAD_TICKS 0x1f
-#define GAMEPAD_ROOT_POINTERS mp_obj_t gamepad_singleton;
-#else
-#define GAMEPAD_ROOT_POINTERS
 #endif
 
 #if CIRCUITPY_KEYPAD
@@ -418,7 +411,6 @@ struct _supervisor_allocation_node;
 #define CIRCUITPY_COMMON_ROOT_POINTERS \
     FLASH_ROOT_POINTERS \
     KEYPAD_ROOT_POINTERS \
-    GAMEPAD_ROOT_POINTERS \
     BOARD_UART_ROOT_POINTER \
     WIFI_MONITOR_ROOT_POINTERS \
     MEMORYMONITOR_ROOT_POINTERS \
@@ -436,7 +428,7 @@ void supervisor_run_background_tasks_if_tick(void);
 
 // CIRCUITPY_AUTORELOAD_DELAY_MS = 0 will completely disable autoreload.
 #ifndef CIRCUITPY_AUTORELOAD_DELAY_MS
-#define CIRCUITPY_AUTORELOAD_DELAY_MS 500
+#define CIRCUITPY_AUTORELOAD_DELAY_MS 750
 #endif
 
 #ifndef CIRCUITPY_FILESYSTEM_FLUSH_INTERVAL_MS
@@ -447,9 +439,9 @@ void supervisor_run_background_tasks_if_tick(void);
 #define CIRCUITPY_PYSTACK_SIZE 1536
 #endif
 
-// Wait this long imediately after startup to see if we are connected to USB.
-#ifndef CIRCUITPY_USB_CONNECTED_SLEEP_DELAY
-#define CIRCUITPY_USB_CONNECTED_SLEEP_DELAY 5
+// Wait this long before sleeping immediately after startup, to see if we are connected via USB or BLE.
+#ifndef CIRCUITPY_WORKFLOW_CONNECTION_SLEEP_DELAY
+#define CIRCUITPY_WORKFLOW_CONNECTION_SLEEP_DELAY 5
 #endif
 
 #ifndef CIRCUITPY_PROCESSOR_COUNT
@@ -479,7 +471,26 @@ void supervisor_run_background_tasks_if_tick(void);
 #define CIRCUITPY_PRECOMPUTE_QSTR_ATTR (1)
 #endif
 
+// Display the Blinka logo in the REPL on displayio displays.
+#ifndef CIRCUITPY_REPL_LOGO
+#define CIRCUITPY_REPL_LOGO (1)
+#endif
+
 // USB settings
+
+// Debug level for TinyUSB. Only outputs over debug UART so it doesn't cause
+// additional USB logging.
+#ifndef CIRCUITPY_DEBUG_TINYUSB
+#define CIRCUITPY_DEBUG_TINYUSB 0
+#endif
+
+#ifndef CIRCUITPY_USB_DEVICE_INSTANCE
+#define CIRCUITPY_USB_DEVICE_INSTANCE 0
+#endif
+
+#ifndef CIRCUITPY_USB_HOST_INSTANCE
+#define CIRCUITPY_USB_HOST_INSTANCE -1
+#endif
 
 // If the port requires certain USB endpoint numbers, define these in mpconfigport.h.
 
@@ -541,5 +552,18 @@ void supervisor_run_background_tasks_if_tick(void);
 #define USB_MIDI_EP_NUM_IN (0)
 #endif
 
+#ifndef MICROPY_WRAP_MP_MAP_LOOKUP
+#define MICROPY_WRAP_MP_MAP_LOOKUP PLACE_IN_ITCM
+#endif
+
+#ifndef MICROPY_WRAP_MP_BINARY_OP
+#define MICROPY_WRAP_MP_BINARY_OP PLACE_IN_ITCM
+#endif
+
+#ifndef MICROPY_WRAP_MP_EXECUTE_BYTECODE
+#define MICROPY_WRAP_MP_EXECUTE_BYTECODE PLACE_IN_ITCM
+#endif
+
+#define MICROPY_PY_OPTIMIZE_PROPERTY_FLASH_SIZE (CIRCUITPY_OPTIMIZE_PROPERTY_FLASH_SIZE)
 
 #endif  // __INCLUDED_MPCONFIG_CIRCUITPY_H
