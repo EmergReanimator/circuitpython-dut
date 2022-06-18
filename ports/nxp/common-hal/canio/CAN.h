@@ -49,10 +49,10 @@ typedef volatile ringbuf_t ring_buffer_t;
     ringbuf_init((ringbuf_t *)rb,(uint8_t *)buf,len)
 
 #define rb_push(rb,buf,len) \
-    ringbuf_push_n((ringbuf_t *)rb,(uint8_t *)buf,len)
+    ringbuf_put_n((ringbuf_t *)rb,(uint8_t *)buf,len)
 
 #define rb_pop(rb,buf,len) \
-    ringbuf_pop_n((ringbuf_t *)rb,(uint8_t *)buf,len)
+    ringbuf_get_n((ringbuf_t *)rb,(uint8_t *)buf,len)
 
 #define rb_is_empty(rb) \
     (ringbuf_num_empty((ringbuf_t *)rb) == ringbuf_capacity((ringbuf_t *)rb))

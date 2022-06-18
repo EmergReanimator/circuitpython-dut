@@ -28,7 +28,7 @@
 
 #include "shared-bindings/analogio/AnalogOut.h"
 #include "py/runtime.h"
-#include "supervisor/shared/translate.h"
+#include "supervisor/shared/translate/translate.h"
 
 
 STATIC bool __match_dac_instance(const dac_pin_set_t *pin_set, const mcu_pin_obj_t *pin) {

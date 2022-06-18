@@ -41,7 +41,7 @@ extern ARM_DRIVER_USBD Driver_USBD0;
 
 /* FIXME: IRQ handlers are different for different MCUs */
 void CPY_USB0_IRQHandler(void) {
-    usb_irq_handler();
+    usb_irq_handler(CIRCUITPY_USB_DEVICE_INSTANCE);
 }
 
 STATIC void __USBD_SignalDeviceEvent(uint32_t event) {
