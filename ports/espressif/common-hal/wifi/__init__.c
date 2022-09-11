@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include "bindings/espidf/__init__.h"
 #include "common-hal/wifi/__init__.h"
 #include "shared-bindings/wifi/__init__.h"
 
@@ -42,12 +43,35 @@ wifi_radio_obj_t common_hal_wifi_radio_obj;
 
 #include "components/log/include/esp_log.h"
 
+#include "supervisor/port.h"
 #include "supervisor/workflow.h"
 
-static const char *TAG = "wifi";
+#if CIRCUITPY_STATUS_BAR
+#include "supervisor/shared/status_bar.h"
+#endif
+
+#include "esp_ipc.h"
+
+#ifdef CONFIG_IDF_TARGET_ESP32
+#include "nvs_flash.h"
+#endif
+
+static const char *TAG = "CP wifi";
+
+STATIC void schedule_background_on_cp_core(void *arg) {
+    #if CIRCUITPY_STATUS_BAR
+    supervisor_status_bar_request_update(false);
+    #endif
+
+    // CircuitPython's VM is run in a separate FreeRTOS task from wifi callbacks. So, we have to
+    // notify the main task every time in case it's waiting for us.
+    port_wake_main_task();
+}
 
 static void event_handler(void *arg, esp_event_base_t event_base,
     int32_t event_id, void *event_data) {
+    // This runs on the PRO CORE! It cannot share CP interrupt enable/disable
+    // directly.
     wifi_radio_obj_t *radio = arg;
     if (event_base == WIFI_EVENT) {
         switch (event_id) {
@@ -108,7 +132,14 @@ static void event_handler(void *arg, esp_event_base_t event_base,
         radio->retries_left = radio->starting_retries;
         xEventGroupSetBits(radio->event_group_handle, WIFI_CONNECTED_BIT);
     }
-    supervisor_workflow_request_background();
+    // Use IPC to ensure we run schedule background on the same core as CircuitPython.
+    #if defined(CONFIG_FREERTOS_UNICORE) && CONFIG_FREERTOS_UNICORE
+    schedule_background_on_cp_core(NULL);
+    #else
+    // This only blocks until the start of the function. That's ok since the PRO
+    // core shouldn't care what we do.
+    esp_ipc_call(CONFIG_ESP_MAIN_TASK_AFFINITY, schedule_background_on_cp_core, NULL);
+    #endif
 }
 
 static bool wifi_inited;
@@ -116,7 +147,12 @@ static bool wifi_ever_inited;
 static bool wifi_user_initiated;
 
 void common_hal_wifi_init(bool user_initiated) {
+    wifi_radio_obj_t *self = &common_hal_wifi_radio_obj;
+
     if (wifi_inited) {
+        if (user_initiated && !wifi_user_initiated) {
+            common_hal_wifi_radio_set_enabled(self, true);
+        }
         return;
     }
     wifi_inited = true;
@@ -129,7 +165,6 @@ void common_hal_wifi_init(bool user_initiated) {
     }
     wifi_ever_inited = true;
 
-    wifi_radio_obj_t *self = &common_hal_wifi_radio_obj;
     self->netif = esp_netif_create_default_wifi_sta();
     self->ap_netif = esp_netif_create_default_wifi_ap();
     self->started = false;
@@ -154,11 +189,21 @@ void common_hal_wifi_init(bool user_initiated) {
         &self->handler_instance_got_ip));
 
     wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();
+    #ifdef CONFIG_IDF_TARGET_ESP32
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        // NVS partition was truncated and needs to be erased
+        // Retry nvs_flash_init
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(err);
+    #endif
     esp_err_t result = esp_wifi_init(&config);
     if (result == ESP_ERR_NO_MEM) {
         mp_raise_msg(&mp_type_MemoryError, translate("Failed to allocate Wifi memory"));
     } else if (result != ESP_OK) {
-        mp_raise_RuntimeError(translate("Failed to init wifi"));
+        raise_esp_error(result);
     }
     // set station mode to avoid the default SoftAP
     common_hal_wifi_radio_start_station(self);
@@ -169,6 +214,7 @@ void common_hal_wifi_init(bool user_initiated) {
 void wifi_user_reset(void) {
     if (wifi_user_initiated) {
         wifi_reset();
+        wifi_user_initiated = false;
     }
 }
 
@@ -179,6 +225,7 @@ void wifi_reset(void) {
     common_hal_wifi_monitor_deinit(MP_STATE_VM(wifi_monitor_singleton));
     wifi_radio_obj_t *radio = &common_hal_wifi_radio_obj;
     common_hal_wifi_radio_set_enabled(radio, false);
+    #ifndef CONFIG_IDF_TARGET_ESP32
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT,
         ESP_EVENT_ANY_ID,
         radio->handler_instance_all_wifi));
@@ -191,6 +238,7 @@ void wifi_reset(void) {
     esp_netif_destroy(radio->ap_netif);
     radio->ap_netif = NULL;
     wifi_inited = false;
+    #endif
     supervisor_workflow_request_background();
 }
 

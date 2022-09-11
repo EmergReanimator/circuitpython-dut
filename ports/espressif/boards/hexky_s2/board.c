@@ -112,8 +112,7 @@ void board_init(void) {
         sizeof(display_init_sequence),
         &pin_GPIO45,    // backlight pin
         NO_BRIGHTNESS_COMMAND,
-        1.0f,           // brightness (ignored)
-        false,          // auto_brightness
+        1.0f,           // brightness
         false,          // single_byte_bounds
         false,          // data_as_commands
         true,           // auto_refresh
@@ -124,10 +123,6 @@ void board_init(void) {
         );
 
     common_hal_never_reset_pin(&pin_GPIO45); // backlight pin
-}
-
-bool board_requests_safe_mode(void) {
-    return false;
 }
 
 bool espressif_board_reset_pin_number(gpio_num_t pin_number) {
@@ -141,9 +136,6 @@ bool espressif_board_reset_pin_number(gpio_num_t pin_number) {
     return false;
 }
 
-void reset_board(void) {
-}
+// Use the MP_WEAK supervisor/shared/board.c versions of routines not defined here.
 
-void board_deinit(void) {
-    // TODO: Should we turn off the display when asleep?
-}
+// TODO: Should we turn off the display when asleep, in board_deinit()?

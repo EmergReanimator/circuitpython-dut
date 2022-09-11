@@ -38,7 +38,7 @@ CIRCUITPY_FRAMEBUFFERIO ?= 0
 CIRCUITPY_FREQUENCYIO ?= 0
 CIRCUITPY_GETPASS ?= 0
 CIRCUITPY_GIFIO ?= 0
-CIRCUITPY_I2CPERIPHERAL ?= 0
+CIRCUITPY_I2CTARGET ?= 0
 CIRCUITPY_JSON ?= 0
 CIRCUITPY_KEYPAD ?= 0
 CIRCUITPY_MSGPACK ?= 0
@@ -61,17 +61,12 @@ endif
 
 MICROPY_PY_ASYNC_AWAIT = 0
 
-# We don't have room for the fonts for terminalio for ja and ko
+# We don't have room for the fonts for terminalio for certain languages,
 # so turn off terminalio, and if it's off and displayio is on,
 # force a clean build.
 # Note that we cannot test $(CIRCUITPY_DISPLAYIO) directly with an
 # ifeq, because it's not set yet.
-ifeq ($(TRANSLATION), ja)
-CIRCUITPY_TERMINALIO = 0
-RELEASE_NEEDS_CLEAN_BUILD = $(CIRCUITPY_DISPLAYIO)
-endif
-
-ifeq ($(TRANSLATION), ko)
+ifneq (,$(filter $(TRANSLATION),ja ko ru))
 CIRCUITPY_TERMINALIO = 0
 RELEASE_NEEDS_CLEAN_BUILD = $(CIRCUITPY_DISPLAYIO)
 endif
@@ -138,3 +133,5 @@ CIRCUITPY_RGBMATRIX ?= $(CIRCUITPY_FRAMEBUFFERIO)
 
 endif # same51
 ######################################################################
+
+CIRCUITPY_BUILD_EXTENSIONS ?= uf2

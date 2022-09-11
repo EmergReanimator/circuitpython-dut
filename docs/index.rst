@@ -22,6 +22,7 @@ Full Table of Contents
    supported_ports.rst
    troubleshooting.rst
    drivers.rst
+   workflows
    environment.rst
 
 .. toctree::
@@ -47,7 +48,7 @@ Full Table of Contents
    ../CONTRIBUTING
    ../BUILDING
    ../CODE_OF_CONDUCT
-   ../license.rst
+   ../docs/LICENSE
    ../WEBUSB_README
 
 Indices and tables

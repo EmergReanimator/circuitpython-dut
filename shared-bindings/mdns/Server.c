@@ -136,7 +136,7 @@ MP_PROPERTY_GETSET(mdns_server_instance_name_obj,
 //|         :param float/int timeout: Time to wait for responses"""
 //|         ...
 //|
-STATIC mp_obj_t mdns_server_find(mp_uint_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+STATIC mp_obj_t _mdns_server_find(mp_uint_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
     mdns_server_obj_t *self = MP_OBJ_TO_PTR(pos_args[0]);
     check_for_deinit(self);
 
@@ -156,10 +156,13 @@ STATIC mp_obj_t mdns_server_find(mp_uint_t n_args, const mp_obj_t *pos_args, mp_
 
     return common_hal_mdns_server_find(self, service_type, protocol, timeout);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_KW(mdns_server_find_obj, 1, mdns_server_find);
+STATIC MP_DEFINE_CONST_FUN_OBJ_KW(mdns_server_find_obj, 1, _mdns_server_find);
 
 //|     def advertise_service(self, *,  service_type: str, protocol: str, port: int) -> None:
 //|         """Respond to queries for the given service with the given port.
+//|
+//|         ``service_type`` and ``protocol`` can only occur on one port. Any call after the first
+//|         will update the entry's port.
 //|
 //|         :param str service_type: The service type such as "_http"
 //|         :param str protocol: The service protocol such as "_tcp"

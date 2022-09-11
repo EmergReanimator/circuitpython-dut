@@ -31,9 +31,27 @@ CircuitPython behavior
 CircuitPython will also read the environment to configure its behavior. Other
 keys are ignored by CircuitPython. Here are the keys it uses:
 
+CIRCUITPY_BLE_NAME
+~~~~~~~~~~~~~~~~~~
+Default BLE name the board advertises as, including for the BLE workflow.
+
+CIRCUITPY_RESERVED_PSRAM
+~~~~~~~~~~~~~~~~~~~~~~~~
+On boards with Espressif microcontrollers with PSRAM (also called SPIRAM), permanently reserve a portion of PSRAM for use by esp-idf.
+This storage is removed from the CircuitPython "heap" and is available for allocation by esp-idf routines in the core instead.
+Generally, only set this to a non-zero value when it is required by a specific core module.
+
+CIRCUITPY_WEB_API_PASSWORD
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Password required to make modifications to the board from the Web Workflow.
+
+CIRCUITPY_WEB_API_PORT
+~~~~~~~~~~~~~~~~~~~~~~
+TCP port number used for the web HTTP API. Defaults to 80 when omitted.
+
 CIRCUITPY_WIFI_PASSWORD
 ~~~~~~~~~~~~~~~~~~~~~~~
-Wi-Fi password used to auto connect to CIRCUITPY_WIFI_SSID
+Wi-Fi password used to auto connect to CIRCUITPY_WIFI_SSID.
 
 CIRCUITPY_WIFI_SSID
 ~~~~~~~~~~~~~~~~~~~

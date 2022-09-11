@@ -369,6 +369,9 @@ bool rp2pio_statemachine_construct(rp2pio_statemachine_obj_t *self,
 }
 
 static uint32_t mask_and_rotate(const mcu_pin_obj_t *first_pin, uint32_t bit_count, uint32_t value) {
+    if (!first_pin) {
+        return 0;
+    }
     value = value & ((1 << bit_count) - 1);
     uint32_t shift = first_pin->number;
     return value << shift | value >> (32 - shift);
@@ -436,7 +439,7 @@ void common_hal_rp2pio_statemachine_construct(rp2pio_statemachine_obj_t *self,
                 if (first_in_pin == NULL) {
                     mp_raise_ValueError_varg(translate("Missing first_in_pin. Instruction %d waits based on pin"), i);
                 }
-                if (wait_index > in_pin_count) {
+                if (wait_index >= in_pin_count) {
                     mp_raise_ValueError_varg(translate("Instruction %d waits on input outside of count"), i);
                 }
             }

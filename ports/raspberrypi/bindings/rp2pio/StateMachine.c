@@ -97,7 +97,7 @@
 //|         """Construct a StateMachine object on the given pins with the given program.
 //|
 //|         :param ReadableBuffer program: the program to run with the state machine
-//|         :param int frequency: the target clock frequency of the state machine. Actual may be less.
+//|         :param int frequency: the target clock frequency of the state machine. Actual may be less. Use 0 for system clock speed.
 //|         :param ReadableBuffer init: a program to run once at start up. This is run after program
 //|              is started so instructions may be intermingled
 //|         :param ~microcontroller.Pin first_out_pin: the first pin to use with the OUT instruction
@@ -247,7 +247,7 @@ STATIC mp_obj_t rp2pio_statemachine_make_new(const mp_obj_type_t *type, size_t n
         mp_raise_ValueError(translate("Program size invalid"));
     }
 
-    mp_arg_validate_length_range(init_bufinfo.len, 2, 64, MP_QSTR_init);
+    mp_arg_validate_length_range(init_bufinfo.len, 0, 64, MP_QSTR_init);
     if (init_bufinfo.len % 2 != 0) {
         mp_raise_ValueError(translate("Init program size invalid"));
     }

@@ -78,7 +78,7 @@ msgstr ""
 #: ports/mimxrt10xx/common-hal/rtc/RTC.c
 #: ports/nrf/common-hal/analogio/AnalogOut.c ports/nrf/common-hal/rtc/RTC.c
 #: ports/raspberrypi/common-hal/analogio/AnalogOut.c
-#: ports/raspberrypi/common-hal/rtc/RTC.c
+#: ports/raspberrypi/common-hal/rtc/RTC.c ports/stm/common-hal/rtc/RTC.c
 msgid "%q"
 msgstr ""
 
@@ -211,7 +211,11 @@ msgstr "%q() mengambil posisi argumen %d tapi %d yang diberikan"
 msgid "%q, %q, and %q must all be the same length"
 msgstr "%q, %q, dan %q semuanya harus memiliki panjang yang sama"
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: py/objint.c
+msgid "%q=%q"
+msgstr ""
+
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 #, c-format
 msgid "%s error 0x%x"
 msgstr "%s kesalahan 0x%x"
@@ -401,7 +405,7 @@ msgid "All CAN peripherals are in use"
 msgstr ""
 
 #: ports/espressif/common-hal/busio/I2C.c
-#: ports/espressif/common-hal/i2cperipheral/I2CPeripheral.c
+#: ports/espressif/common-hal/i2ctarget/I2CTarget.c
 #: ports/nrf/common-hal/busio/I2C.c
 msgid "All I2C peripherals are in use"
 msgstr "Semua perangkat I2C sedang digunakan"
@@ -438,7 +442,6 @@ msgstr ""
 msgid "All event channels in use"
 msgstr "Semua channel event sedang digunakan"
 
-#: ports/raspberrypi/common-hal/pulseio/PulseIn.c
 #: ports/raspberrypi/common-hal/rp2pio/StateMachine.c
 msgid "All state machines in use"
 msgstr ""
@@ -524,7 +527,7 @@ msgstr ""
 msgid "AuthMode.OPEN is not used with password"
 msgstr ""
 
-#: shared-bindings/wifi/Radio.c
+#: shared-bindings/wifi/Radio.c supervisor/shared/web_workflow/web_workflow.c
 msgid "Authentication failure"
 msgstr ""
 
@@ -650,7 +653,7 @@ msgstr "Blok CBC harus merupakan kelipatan 16 byte"
 msgid "CIRCUITPY drive could not be found or created."
 msgstr ""
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "CRC or checksum was invalid"
 msgstr ""
 
@@ -873,6 +876,10 @@ msgstr "Tampilan harus memiliki ruang warna 16 bit."
 msgid "Display rotation must be in 90 degree increments"
 msgstr "Rotasi tampilan harus dalam kelipatan 90 derajat"
 
+#: main.c
+msgid "Done"
+msgstr ""
+
 #: shared-bindings/digitalio/DigitalInOut.c
 msgid "Drive mode not used when direction is input."
 msgstr "Mode kendara tidak digunakan saat arah input."
@@ -968,10 +975,6 @@ msgstr "Gagal terhubung: kesalahan internal"
 msgid "Failed to connect: timeout"
 msgstr "Gagal terhubung: habis waktu"
 
-#: ports/espressif/common-hal/wifi/__init__.c
-msgid "Failed to init wifi"
-msgstr ""
-
 #: shared-module/audiomp3/MP3Decoder.c
 msgid "Failed to parse MP3 file"
 msgstr "Gagal mengurai file MP3"
@@ -1033,7 +1036,7 @@ msgstr "Fungsinya membutuhkan kunci"
 msgid "GNSS init"
 msgstr ""
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Generic Failure"
 msgstr ""
 
@@ -1069,6 +1072,7 @@ msgid "I2C init error"
 msgstr ""
 
 #: ports/raspberrypi/common-hal/busio/I2C.c
+#: ports/raspberrypi/common-hal/i2ctarget/I2CTarget.c
 msgid "I2C peripheral in use"
 msgstr ""
 
@@ -1175,6 +1179,10 @@ msgstr ""
 msgid "Internal error #%d"
 msgstr "Kesalahan internal #%d"
 
+#: supervisor/shared/safe_mode.c
+msgid "Internal watchdog timer expired."
+msgstr ""
+
 #: py/argcheck.c
 msgid "Invalid %q"
 msgstr ""
@@ -1200,7 +1208,7 @@ msgstr ""
 msgid "Invalid MAC address"
 msgstr ""
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 #: py/moduerrno.c
 msgid "Invalid argument"
 msgstr "Argumen tidak valid"
@@ -1230,7 +1238,7 @@ msgstr ""
 msgid "Invalid pins"
 msgstr "Pin-pin tidak valid"
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Invalid size"
 msgstr ""
 
@@ -1238,7 +1246,7 @@ msgstr ""
 msgid "Invalid socket for TLS"
 msgstr ""
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Invalid state"
 msgstr ""
 
@@ -1262,7 +1270,7 @@ msgstr ""
 msgid "Layer must be a Group or TileGrid subclass"
 msgstr ""
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "MAC address was invalid"
 msgstr ""
 
@@ -1548,6 +1556,14 @@ msgstr ""
 msgid "Odd parity is not supported"
 msgstr "Parity ganjil tidak didukung"
 
+#: supervisor/shared/bluetooth/bluetooth.c
+msgid "Off"
+msgstr ""
+
+#: supervisor/shared/bluetooth/bluetooth.c
+msgid "Ok"
+msgstr ""
+
 #: ports/atmel-samd/common-hal/audiobusio/PDMIn.c
 #: ports/raspberrypi/common-hal/audiobusio/PDMIn.c
 msgid "Only 8 or 16 bit mono with "
@@ -1557,7 +1573,7 @@ msgstr "Hanya 8 atau 16 bit mono dengan "
 msgid "Only IPv4 addresses supported"
 msgstr "Hanya alamat IPv4 yang didukung"
 
-#: ports/espressif/common-hal/socketpool/SocketPool.c
+#: ports/espressif/common-hal/socketpool/Socket.c
 msgid "Only IPv4 sockets supported"
 msgstr "Hanysa socket IPv4 yang didukung"
 
@@ -1594,7 +1610,8 @@ msgstr ""
 msgid "Only one TouchAlarm can be set in deep sleep."
 msgstr ""
 
-#: ports/espressif/common-hal/i2cperipheral/I2CPeripheral.c
+#: ports/espressif/common-hal/i2ctarget/I2CTarget.c
+#: ports/raspberrypi/common-hal/i2ctarget/I2CTarget.c
 msgid "Only one address is allowed"
 msgstr ""
 
@@ -1617,19 +1634,19 @@ msgstr ""
 msgid "Operation not permitted"
 msgstr ""
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Operation or feature not supported"
 msgstr ""
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Operation timed out"
 msgstr "Waktu habis"
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Out of memory"
 msgstr "Kehabisan memori"
 
-#: ports/espressif/common-hal/socketpool/SocketPool.c
+#: ports/espressif/common-hal/socketpool/Socket.c
 msgid "Out of sockets"
 msgstr "Kehabisan socket"
 
@@ -1807,8 +1824,12 @@ msgstr "sistem file (filesystem) bersifat Read-only"
 msgid "Read-only object"
 msgstr "Objek Read-only"
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Received response was invalid"
+msgstr ""
+
+#: supervisor/shared/bluetooth/bluetooth.c
+msgid "Reconnecting"
 msgstr ""
 
 #: shared-bindings/displayio/EPaperDisplay.c
@@ -1823,7 +1844,7 @@ msgstr ""
 msgid "Requested AES mode is unsupported"
 msgstr "Mode AES yang diminta tidak didukung"
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Requested resource not found"
 msgstr ""
 
@@ -2227,6 +2248,10 @@ msgstr "Tipe bus tampilan tidak didukung"
 msgid "Unsupported format"
 msgstr "Format tidak didukung"
 
+#: shared-bindings/hashlib/__init__.c
+msgid "Unsupported hash algorithm"
+msgstr ""
+
 #: ports/espressif/common-hal/dualbank/__init__.c
 msgid "Update Failed"
 msgstr ""
@@ -2245,7 +2270,7 @@ msgstr "Panjang nilai != Panjang tetap yang dibutuhkan"
 msgid "Value length > max_length"
 msgstr "Panjang nilai > max_length"
 
-#: ports/espressif/bindings/espidf/__init__.c ports/espressif/esp_error.c
+#: ports/espressif/common-hal/espidf/__init__.c ports/espressif/esp_error.c
 msgid "Version was invalid"
 msgstr ""
 
@@ -2273,10 +2298,6 @@ msgstr ""
 
 #: shared-bindings/watchdog/WatchDogTimer.c
 msgid "WatchDogTimer.timeout must be greater than 0"
-msgstr ""
-
-#: supervisor/shared/safe_mode.c
-msgid "Watchdog timer expired."
 msgstr ""
 
 #: py/builtinhelp.c
@@ -2331,11 +2352,11 @@ msgstr "__new__ arg harus berupa user-type"
 msgid "a bytes-like object is required"
 msgstr "sebuah objek menyerupai byte (bytes-like) dibutuhkan"
 
-#: shared-bindings/i2cperipheral/I2CPeripheral.c
+#: shared-bindings/i2ctarget/I2CTarget.c
 msgid "address out of bounds"
 msgstr "alamat di luar batas"
 
-#: shared-bindings/i2cperipheral/I2CPeripheral.c
+#: shared-bindings/i2ctarget/I2CTarget.c
 msgid "addresses is empty"
 msgstr "alamatnya kosong"
 
@@ -2382,6 +2403,10 @@ msgstr "argumen harus berupa ndarrays"
 
 #: extmod/ulab/code/ndarray.c
 msgid "array and index length must be equal"
+msgstr ""
+
+#: extmod/ulab/code/numpy/io/io.c
+msgid "array has too many dimensions"
 msgstr ""
 
 #: py/objarray.c shared-bindings/alarm/SleepMemory.c
@@ -2523,7 +2548,7 @@ msgstr "tidak dapat menetapkan ke ekspresi"
 msgid "can't cancel self"
 msgstr ""
 
-#: py/obj.c py/objint.c shared-bindings/i2cperipheral/I2CPeripheral.c
+#: py/obj.c py/objint.c shared-bindings/i2ctarget/I2CTarget.c
 #: shared-module/adafruit_pixelbuf/PixelBuf.c
 msgid "can't convert %q to %q"
 msgstr ""
@@ -2751,6 +2776,10 @@ msgstr ""
 msgid "convolve arguments must not be empty"
 msgstr ""
 
+#: extmod/ulab/code/numpy/io/io.c
+msgid "corrupted file"
+msgstr ""
+
 #: extmod/ulab/code/numpy/poly.c
 msgid "could not invert Vandermonde matrix"
 msgstr ""
@@ -2842,6 +2871,10 @@ msgstr ""
 msgid "empty"
 msgstr ""
 
+#: extmod/ulab/code/numpy/io/io.c
+msgid "empty file"
+msgstr ""
+
 #: extmod/moduasyncio.c extmod/moduheapq.c extmod/modutimeq.c
 msgid "empty heap"
 msgstr "heap kosong"
@@ -2870,6 +2903,12 @@ msgstr ""
 #, c-format
 msgid "error = 0x%08lX"
 msgstr "error = 0x%08lX"
+
+#: ports/espressif/common-hal/esp32_camera/Camera.c
+msgid ""
+"esp32_camera.Camera requires reserved PSRAM to be configured. See the "
+"documentation for instructions."
+msgstr ""
 
 #: py/runtime.c
 msgid "exceptions must derive from BaseException"
@@ -2945,7 +2984,7 @@ msgstr ""
 msgid "first argument must be a tuple of ndarrays"
 msgstr ""
 
-#: extmod/ulab/code/numpy/vector.c
+#: extmod/ulab/code/numpy/transform.c extmod/ulab/code/numpy/vector.c
 msgid "first argument must be an ndarray"
 msgstr ""
 
@@ -3093,7 +3132,7 @@ msgstr ""
 msgid "incorrect padding"
 msgstr "lapisan (padding) tidak benar"
 
-#: extmod/ulab/code/ndarray.c
+#: extmod/ulab/code/ndarray.c extmod/ulab/code/numpy/transform.c
 msgid "index is out of bounds"
 msgstr ""
 
@@ -3160,6 +3199,10 @@ msgstr ""
 msgid "input matrix is singular"
 msgstr ""
 
+#: extmod/ulab/code/numpy/create.c
+msgid "input must be 1- or 2-d"
+msgstr ""
+
 #: extmod/ulab/code/numpy/carray/carray.c
 msgid "input must be a 1D ndarray"
 msgstr ""
@@ -3168,11 +3211,7 @@ msgstr ""
 msgid "input must be a dense ndarray"
 msgstr ""
 
-#: extmod/ulab/code/numpy/create.c
-msgid "input must be a tensor of rank 2"
-msgstr ""
-
-#: extmod/ulab/code/numpy/create.c extmod/ulab/code/user/user.c
+#: extmod/ulab/code/user/user.c
 msgid "input must be an ndarray"
 msgstr ""
 
@@ -3251,6 +3290,10 @@ msgstr ""
 #: py/compile.c
 msgid "invalid micropython decorator"
 msgstr "micropython decorator tidak valid"
+
+#: ports/espressif/common-hal/esp32_camera/Camera.c
+msgid "invalid setting"
+msgstr ""
 
 #: shared-bindings/random/__init__.c
 msgid "invalid step"
@@ -3373,7 +3416,7 @@ msgid "max_length must be 0-%d when fixed_length is %s"
 msgstr ""
 
 #: extmod/ulab/code/ndarray.c
-msgid "maximum number of dimensions is 4"
+msgid "maximum number of dimensions is "
 msgstr ""
 
 #: py/runtime.c
@@ -3507,7 +3550,7 @@ msgstr ""
 msgid "no response from SD card"
 msgstr ""
 
-#: py/objobject.c py/runtime.c
+#: ports/espressif/common-hal/esp32_camera/Camera.c py/objobject.c py/runtime.c
 msgid "no such attribute"
 msgstr ""
 
@@ -3622,7 +3665,7 @@ msgstr "panjang data string memiliki keganjilan (odd-length)"
 msgid "off"
 msgstr ""
 
-#: extmod/ulab/code/numpy/create.c extmod/ulab/code/utils/utils.c
+#: extmod/ulab/code/utils/utils.c
 msgid "offset is too large"
 msgstr ""
 
@@ -3772,7 +3815,21 @@ msgstr ""
 msgid "pow() with 3 arguments requires integers"
 msgstr ""
 
+#: ports/espressif/boards/adafruit_qtpy_esp32_pico/mpconfigboard.h
+msgid "pressing BOOT button at start up.\n"
+msgstr ""
+
+#: ports/espressif/boards/adafruit_feather_esp32_v2/mpconfigboard.h
+msgid "pressing SW38 button at start up.\n"
+msgstr ""
+
+#: ports/espressif/boards/hardkernel_odroid_go/mpconfigboard.h
+msgid "pressing VOLUME button at start up.\n"
+msgstr ""
+
 #: ports/espressif/boards/adafruit_qtpy_esp32c3/mpconfigboard.h
+#: ports/espressif/boards/beetle-esp32-c3/mpconfigboard.h
+#: ports/espressif/boards/lolin_c3_mini/mpconfigboard.h
 #: supervisor/shared/safe_mode.c
 msgid "pressing boot button at start up.\n"
 msgstr ""
@@ -3945,10 +4002,6 @@ msgstr ""
 
 #: shared-bindings/bitmaptools/__init__.c
 msgid "source_bitmap must have value_count of 8"
-msgstr ""
-
-#: shared-bindings/wifi/Radio.c
-msgid "ssid can't be more than 32 bytes"
 msgstr ""
 
 #: py/objstr.c
@@ -4212,6 +4265,14 @@ msgstr ""
 msgid "unsupported types for %q: '%q', '%q'"
 msgstr ""
 
+#: extmod/ulab/code/numpy/io/io.c
+msgid "usecols is too high"
+msgstr ""
+
+#: extmod/ulab/code/numpy/io/io.c
+msgid "usecols keyword must be specified"
+msgstr ""
+
 #: py/objint.c
 #, c-format
 msgid "value must fit in %d byte(s)"
@@ -4253,12 +4314,26 @@ msgstr "indeks sumbu salah"
 msgid "wrong axis specified"
 msgstr "sumbu yang ditentukan salah"
 
-#: extmod/ulab/code/numpy/compare.c extmod/ulab/code/numpy/vector.c
+#: extmod/ulab/code/numpy/io/io.c
+msgid "wrong dtype"
+msgstr ""
+
+#: extmod/ulab/code/numpy/transform.c
+msgid "wrong index type"
+msgstr ""
+
+#: extmod/ulab/code/numpy/compare.c extmod/ulab/code/numpy/create.c
+#: extmod/ulab/code/numpy/io/io.c extmod/ulab/code/numpy/transform.c
+#: extmod/ulab/code/numpy/vector.c
 msgid "wrong input type"
 msgstr "tipe input salah"
 
 #: extmod/ulab/code/numpy/transform.c
 msgid "wrong length of condition array"
+msgstr ""
+
+#: extmod/ulab/code/numpy/transform.c
+msgid "wrong length of index array"
 msgstr ""
 
 #: extmod/ulab/code/numpy/create.c py/objarray.c py/objstr.c
