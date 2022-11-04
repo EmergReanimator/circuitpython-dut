@@ -237,7 +237,11 @@ SRC_C += $(wildcard boards/$(BOARD_LOWER)/*config.c)
 
 OPTIMIZATION_FLAGS ?= -Os -ggdb3 -pipe
 ifeq ($(CIRCUITPY_OS), 0)
-OPTIMIZATION_FLAGS += -ffreestanding
+# Enabling freestanding with
+# arm-none-eabi-gcc (GNU Arm Embedded Toolchain 10-2020-q4-major)
+# 10.2.1 20201103 (release)
+# causes insane code size
+# OPTIMIZATION_FLAGS += -ffreestanding
 endif
 
 CFLAGS += -DMICROPY_DEBUG_VERBOSE=0

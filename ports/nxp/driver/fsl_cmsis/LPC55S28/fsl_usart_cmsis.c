@@ -2233,7 +2233,7 @@ extern uint32_t USART8_GetFreq(void);
 
 static cmsis_usart_resource_t usart8_Resource = {USART8, USART8_GetFreq};
 
-#if defined(RTE_USART8_DMA_EN)RTE_USART8_DMA_EN
+#if defined(RTE_USART8_DMA_EN) RTE_USART8_DMA_EN
 
 #if (defined(FSL_FEATURE_SOC_DMA_COUNT) && FSL_FEATURE_SOC_DMA_COUNT)
 

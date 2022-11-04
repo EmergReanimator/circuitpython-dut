@@ -228,6 +228,9 @@ void port_reset_i2c(void) {
 
 void common_hal_busio_i2c_construct(busio_i2c_obj_t *self,
     const mcu_pin_obj_t *scl, const mcu_pin_obj_t *sda, uint32_t frequency, uint32_t timeout) {
+    #if (I2C_INSTANCES_NUM == 0)
+    mp_raise_NotImplementedError(translate("I2C is not implemented"));
+    #else
 
     if (NULL == self->i2c_instance) {
         self->i2c_instance = (i2c_inst_t *)NULL;
@@ -290,6 +293,7 @@ void common_hal_busio_i2c_construct(busio_i2c_obj_t *self,
     }
 
     return;
+    #endif
 }
 
 
@@ -332,7 +336,7 @@ void common_hal_busio_i2c_unlock(busio_i2c_obj_t *self) {
     self->has_lock = false;
 }
 
-
+#if (0 != I2C_INSTANCES_NUM)
 STATIC uint8_t __common_hal_busio_i2c_write(busio_i2c_obj_t *self, uint16_t addr,
     const uint8_t *data, size_t len, bool transmit_stop_bit) {
 
@@ -367,14 +371,21 @@ STATIC uint8_t __common_hal_busio_i2c_write(busio_i2c_obj_t *self, uint16_t addr
 
     return err;
 }
+#endif
 
-
+#if (0 != I2C_INSTANCES_NUM)
 uint8_t common_hal_busio_i2c_write(busio_i2c_obj_t *self, uint16_t addr,
     const uint8_t *data, size_t len) {
     return __common_hal_busio_i2c_write(self, addr, data, len, true);
 }
+#else
+uint8_t common_hal_busio_i2c_write(busio_i2c_obj_t *self, uint16_t addr,
+    const uint8_t *data, size_t len) {
+    return MP_ENODEV;
+}
+#endif
 
-
+#if (0 != I2C_INSTANCES_NUM)
 uint8_t common_hal_busio_i2c_read(busio_i2c_obj_t *self, uint16_t addr,
     uint8_t *data, size_t len) {
     bool transmit_stop_bit = false;
@@ -409,8 +420,14 @@ uint8_t common_hal_busio_i2c_read(busio_i2c_obj_t *self, uint16_t addr,
 
     return err;
 }
+#else
+uint8_t common_hal_busio_i2c_read(busio_i2c_obj_t *self, uint16_t addr,
+    uint8_t *data, size_t len) {
+    return MP_ENODEV;
+}
+#endif
 
-
+#if (0 != I2C_INSTANCES_NUM)
 uint8_t common_hal_busio_i2c_write_read(busio_i2c_obj_t *self, uint16_t addr,
     uint8_t *out_data, size_t out_len, uint8_t *in_data, size_t in_len) {
     uint8_t result = __common_hal_busio_i2c_write(self, addr, out_data, out_len, false);
@@ -420,6 +437,12 @@ uint8_t common_hal_busio_i2c_write_read(busio_i2c_obj_t *self, uint16_t addr,
 
     return common_hal_busio_i2c_read(self, addr, in_data, in_len);
 }
+#else
+uint8_t common_hal_busio_i2c_write_read(busio_i2c_obj_t *self, uint16_t addr,
+    uint8_t *out_data, size_t out_len, uint8_t *in_data, size_t in_len) {
+    return MP_ENODEV;
+}
+#endif
 
 void common_hal_busio_i2c_never_reset(busio_i2c_obj_t *self) {
     self->i2c_instance->is_used = true;

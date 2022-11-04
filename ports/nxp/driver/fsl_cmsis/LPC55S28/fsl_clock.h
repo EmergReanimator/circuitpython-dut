@@ -1095,10 +1095,10 @@ typedef enum _pll_error
 /*! @brief USB FS clock source definition. */
 typedef enum _clock_usbfs_src
 {
-    kCLOCK_UsbfsSrcFro       = (uint32_t)kCLOCK_FroHf,      /*!< Use FRO 96 MHz. */
-    kCLOCK_UsbfsSrcPll0      = (uint32_t)kCLOCK_Pll0Out,    /*!< Use PLL0 output. */
-    kCLOCK_UsbfsSrcMainClock = (uint32_t)kCLOCK_CoreSysClk, /*!< Use Main clock.    */
-    kCLOCK_UsbfsSrcPll1      = (uint32_t)kCLOCK_Pll1Out,    /*!< Use PLL1 clock.    */
+    kCLOCK_UsbfsSrcFro       = (uint32_t) kCLOCK_FroHf,      /*!< Use FRO 96 MHz. */
+    kCLOCK_UsbfsSrcPll0      = (uint32_t) kCLOCK_Pll0Out,    /*!< Use PLL0 output. */
+    kCLOCK_UsbfsSrcMainClock = (uint32_t) kCLOCK_CoreSysClk, /*!< Use Main clock.    */
+    kCLOCK_UsbfsSrcPll1      = (uint32_t) kCLOCK_Pll1Out,    /*!< Use PLL1 clock.    */
 
     kCLOCK_UsbfsSrcNone =
         SYSCON_USB0CLKSEL_SEL(7) /*!<this may be selected in order to reduce power when no output is needed. */

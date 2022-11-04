@@ -256,6 +256,9 @@ void common_hal_busio_uart_construct(busio_uart_obj_t *self,
     uint32_t baudrate, uint8_t bits, busio_uart_parity_t parity, uint8_t stop,
     mp_float_t timeout, uint16_t receiver_buffer_size, byte *receiver_buffer,
     bool sigint_enabled) {
+    #if !UART_INSTANCES_NUM
+    mp_raise_NotImplementedError(translate("UART is not implemented"));
+    #else
 
     if (NULL == self->uart_instance) {
         if ((rts != NULL) || (cts != NULL) || (rs485_dir != NULL) || (rs485_invert == true)) {
@@ -343,6 +346,7 @@ void common_hal_busio_uart_construct(busio_uart_obj_t *self,
     }
 
     return;
+    #endif
 }
 
 bool common_hal_busio_uart_deinited(busio_uart_obj_t *self) {
