@@ -54,7 +54,7 @@ typedef struct {
     uint32_t frequency;
 } busio_i2c_obj_t;
 
-void reset_i2c(void);
+void port_reset_i2c(void);
 
 
 #endif // MICROPY_INCLUDED_NXP_COMMON_HAL_BUSIO_I2C_H

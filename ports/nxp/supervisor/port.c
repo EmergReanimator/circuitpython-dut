@@ -33,6 +33,8 @@
 
 #include "device.h"
 #include "ports/nxp/supervisor/port_nxp.h"
+#include "ports/nxp/common-hal/busio/SPI.h"
+#include "ports/nxp/common-hal/busio/I2C.h"
 #include "driver/iap.h"
 #include "diag/Trace.h"
 
@@ -387,6 +389,8 @@ void reset_port(void) {
     #if (1)
     trace_initialize();
     reset_all_pins();
+    port_reset_spi();
+    port_reset_i2c();
     NXP_IAP_Init();
 
     return;

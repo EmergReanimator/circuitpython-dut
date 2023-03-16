@@ -216,12 +216,23 @@ STATIC void __i2c_deinit(busio_i2c_obj_t *self) {
 }
 
 void port_reset_i2c(void) {
-    // TODO: Implement port_reset_i2c
-    #if (0)
-    busio_i2c_obj_t *self;
-    common_hal_reset_pin(self->scl);
-    common_hal_reset_pin(self->sda);
-    #endif
+    for (size_t n = 0; n < I2C_INSTANCES_NUM; n++)
+    {
+        i2c_inst_t *i2c_instance = get_i2c_instance(n);
+        if (i2c_instance->is_used) {
+            reset_pin_number(NXP_PORT_GPIO_PIN_PORT(i2c_instance->pin_map->scl), NXP_PORT_GPIO_PIN_NUMBER(i2c_instance->pin_map->scl));
+            reset_pin_number(NXP_PORT_GPIO_PIN_PORT(i2c_instance->pin_map->sda), NXP_PORT_GPIO_PIN_NUMBER(i2c_instance->pin_map->sda));
+
+            i2c_instance->is_used = false;
+            ARM_DRIVER_I2C *i2c_drv = i2c_instance->driver;
+
+            if (i2c_drv) {
+                i2c_drv->PowerControl(ARM_POWER_OFF);
+                i2c_drv->Uninitialize();
+            }
+        }
+    }
+
     return;
 }
 
@@ -304,6 +315,33 @@ bool common_hal_busio_i2c_deinited(busio_i2c_obj_t *self) {
 
 void common_hal_busio_i2c_deinit(busio_i2c_obj_t *self) {
     /* TODO: Implement common_hal_busio_i2c_deinit */
+    // return;
+
+    bool is_deinited = common_hal_busio_i2c_deinited(self);
+
+    if (!is_deinited) {
+        #if (0)
+        never_reset_spi[spi_get_index(self->peripheral)] = false;
+        spi_deinit(self->peripheral);
+        #endif
+
+        common_hal_reset_pin(self->scl);
+        common_hal_reset_pin(self->sda);
+        self->scl = NULL;
+        self->sda = NULL;
+
+        i2c_inst_t *i2c_instance = self->i2c_instance;
+        if (i2c_instance) {
+            self->i2c_instance = NULL;
+            i2c_instance->is_used = false;
+            ARM_DRIVER_I2C *i2c_drv = i2c_instance->driver;
+
+            if (i2c_drv) {
+                i2c_drv->PowerControl(ARM_POWER_OFF);
+                i2c_drv->Uninitialize();
+            }
+        }
+    }
     return;
 }
 
@@ -344,7 +382,7 @@ STATIC uint8_t __common_hal_busio_i2c_write(busio_i2c_obj_t *self, uint16_t addr
     ARM_DRIVER_I2C *i2c_drv = i2c_instance->driver;
     __i2c_events[i2c_instance->id] = 0U;
 
-    int32_t drv_err = i2c_drv->MasterTransmit(addr, data, len, transmit_stop_bit);
+    int32_t drv_err = i2c_drv->MasterTransmit(addr, data, len, (transmit_stop_bit ? 0 : 1));
 
     uint8_t err = 0u;
     if (!drv_err) {

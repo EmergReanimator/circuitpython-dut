@@ -209,6 +209,23 @@ STATIC void __spi_init(busio_spi_obj_t *self, ARM_DRIVER_SPI *spi_drv, cb_func c
 
 void port_reset_spi(void) {
     // TODO: Implement reset_spi
+    for (size_t n = 0; n < SPI_INSTANCES_NUM; n++)
+    {
+        spi_inst_t *spi_instance = get_spi_instance(n);
+        if (spi_instance->is_used) {
+            reset_pin_number(NXP_PORT_GPIO_PIN_PORT(spi_instance->pin_map->clock), NXP_PORT_GPIO_PIN_NUMBER(spi_instance->pin_map->clock));
+            reset_pin_number(NXP_PORT_GPIO_PIN_PORT(spi_instance->pin_map->mosi), NXP_PORT_GPIO_PIN_NUMBER(spi_instance->pin_map->mosi));
+            reset_pin_number(NXP_PORT_GPIO_PIN_PORT(spi_instance->pin_map->miso), NXP_PORT_GPIO_PIN_NUMBER(spi_instance->pin_map->miso));
+
+            spi_instance->is_used = false;
+            ARM_DRIVER_SPI *spi_drv = spi_instance->driver;
+
+            if (spi_drv) {
+                spi_drv->PowerControl(ARM_POWER_OFF);
+                spi_drv->Uninitialize();
+            }
+        }
+    }
     return;
 }
 
@@ -224,6 +241,7 @@ void common_hal_busio_spi_construct(busio_spi_obj_t *self,
     self->clock = (const mcu_pin_obj_t *)NULL;
     self->miso = (const mcu_pin_obj_t *)NULL;
     self->mosi = (const mcu_pin_obj_t *)NULL;
+    self->has_lock = false;
 
     bool valid_pin_set = __validate_pins(clock, mosi, miso);
     size_t instance_idx = __lookup_matching_free_spi_instance(clock, mosi, miso);
@@ -231,19 +249,19 @@ void common_hal_busio_spi_construct(busio_spi_obj_t *self,
     if (valid_pin_set && (SIZE_MAX > instance_idx)) {
         spi_inst_t *spi_instance = get_spi_instance(instance_idx);
         if (!spi_instance->is_used) {
-            common_hal_mcu_pin_claim(self->clock);
             common_hal_reset_pin(clock);
+            common_hal_mcu_pin_claim(self->clock);
             self->clock = clock;
 
             if (NULL != mosi) {
-                common_hal_mcu_pin_claim(self->mosi);
                 common_hal_reset_pin(mosi);
+                common_hal_mcu_pin_claim(self->mosi);
                 self->mosi = mosi;
             }
 
             if (NULL != miso) {
-                common_hal_mcu_pin_claim(self->miso);
                 common_hal_reset_pin(miso);
+                common_hal_mcu_pin_claim(self->miso);
                 self->miso = miso;
             }
 

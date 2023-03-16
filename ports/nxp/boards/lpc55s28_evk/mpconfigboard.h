@@ -47,8 +47,8 @@
 #define CIRCUITPY_DEFAULT_HEAP_SIZE                 (AHBRAM_SIZE - CIRCUITPY_DEFAULT_STACK_SIZE)
 
 #if (1)
-#define CIRCUITPY_DEBUG_UART_TX                     (&pin_P0_30)
-#define CIRCUITPY_DEBUG_UART_RX                     (&pin_P0_29)
+#define CIRCUITPY_CONSOLE_UART_TX                     (&pin_P0_30)
+#define CIRCUITPY_CONSOLE_UART_RX                     (&pin_P0_29)
 #endif
 
 #if (1)
