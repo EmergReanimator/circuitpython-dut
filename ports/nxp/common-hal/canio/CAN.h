@@ -45,8 +45,14 @@ typedef volatile ringbuf_t ring_buffer_t;
 #define rb_alloc(rb,len) \
     ringbuf_alloc((ringbuf_t *)rb,len,true)
 
+#define rb_deaalloc(rb) \
+    ((void)rb)
+
 #define rb_init(rb,buf,len) \
     ringbuf_init((ringbuf_t *)rb,(uint8_t *)buf,len)
+
+#define rb_deinit(rb) \
+    ringbuf_deinit((ringbuf_t *)rb)
 
 #define rb_push(rb,buf,len) \
     ringbuf_put_n((ringbuf_t *)rb,(uint8_t *)buf,len)

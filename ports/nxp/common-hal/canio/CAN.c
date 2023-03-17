@@ -406,6 +406,9 @@ void common_hal_canio_can_deinit(canio_can_obj_t *self) {
 
         common_hal_reset_pin(self->tx);
         common_hal_reset_pin(self->rx);
+
+        rb_deinit(&self->can_instance->rx_msg_pool);
+        rb_deinit(&self->can_instance->rx_msg_queue);
     }
 
     return;
