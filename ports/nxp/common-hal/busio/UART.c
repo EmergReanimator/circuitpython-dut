@@ -384,11 +384,7 @@ void common_hal_busio_uart_deinit(busio_uart_obj_t *self) {
             self->cts = NULL;
         }
 
-        #if (1)
-        /* ...  */
-        #else
-        ringbuf_free((ringbuf_t *)&uart_instance->ringbuf);
-        #endif
+        ringbuf_deinit((ringbuf_t *)&uart_instance->ringbuf);
     }
 
     return;
