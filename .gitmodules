@@ -327,3 +327,15 @@
 	path = ports/broadcom/peripherals
 	url = https://github.com/adafruit/broadcom-peripherals.git
 	branch = main-build
+[submodule "ports/nxp/cmsis5"]
+	path = ports/nxp/cmsis5
+	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "ports/nxp/mcux-sdk"]
+	path = ports/nxp/mcux-sdk
+	url = https://github.com/EmergReanimator/mcux-sdk
+[submodule "ports/nxp/nxp_lpc"]
+	path = ports/nxp/nxp_lpc
+	url = https://github.com/ARM-software/NXP_LPC
+[submodule "ports/nxp/nxp_lpcopen"]
+	path = ports/nxp/nxp_lpcopen
+	url = https://github.com/EmergReanimator/nxp_lpcopen.git
