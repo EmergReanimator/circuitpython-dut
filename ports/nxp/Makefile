@@ -22,14 +22,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# Select the board to build for.
-ifeq ($(BOARD),)
-  $(error You must provide a BOARD parameter)
-else
-  ifeq ($(wildcard boards/$(BOARD)/.),)
-    $(error Invalid BOARD specified)
-  endif
-endif
+include ../../py/circuitpy_mkenv.mk
+
+CROSS_COMPILE = arm-none-eabi-
 
 # If the build directory is not given, make it reflect the board name.
 ifeq ($(DEBUG), 1)
@@ -37,34 +32,6 @@ BUILD ?= build-$(BOARD)-debug
 else
 BUILD ?= build-$(BOARD)
 endif
-
-include ../../py/mkenv.mk
-
-# Board-specific
-include boards/$(BOARD)/mpconfigboard.mk
-
-# Port-specific
-include mpconfigport.mk
-
-ifndef USB_NUM_ENDPOINT_PAIRS
-$(error "USB_NUM_ENDPOINT_PAIRS (number of USB endpoint pairs)must be defined")
-endif
-
-# CircuitPython-specific
-include $(TOP)/py/circuitpy_mpconfig.mk
-
-# qstr definitions (must come before including py.mk)
-QSTR_DEFS = qstrdefsport.h
-
-# include py core make definitions
-include $(TOP)/py/py.mk
-
-include $(TOP)/supervisor/supervisor.mk
-
-# Include make rules and variables common across CircuitPython builds.
-include $(TOP)/py/circuitpy_defns.mk
-
-CROSS_COMPILE = arm-none-eabi-
 
 CHIP_FAMILY_LOWER = $(shell echo $(CHIP_FAMILY) | tr '[:upper:]' '[:lower:]')
 CHIP_VARIANT_LOWER = $(shell echo $(CHIP_VARIANT) | tr '[:upper:]' '[:lower:]')

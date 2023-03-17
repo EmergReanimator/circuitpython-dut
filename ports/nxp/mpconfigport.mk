@@ -84,3 +84,5 @@ CIRCUITPY_TUSB_MEM_ALIGN = 256
 
 # LPC55Sxx requires USB SRAM memory for high speed
 CIRCUITPY_TUSB_ATTR_USBRAM = ".bss.usbsram"
+
+CIRCUITPY_BUILD_EXTENSIONS = bin
