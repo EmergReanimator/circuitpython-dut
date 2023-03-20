@@ -367,17 +367,15 @@ void common_hal_canio_can_construct(canio_can_obj_t *self,
             common_hal_reset_pin(rx);
             self->rx = rx;
 
-            can_instance->is_used = true;
-            ARM_DRIVER_CAN *can_drv = can_instance->driver;
-
             self->can_instance = can_instance;
+            can_instance->is_used = true;
 
             can_enable(can_instance);
             __can_init(self, __object_cb[instance_idx], baudrate, loopback, silent);
 
             /* RX buffer will be allocated in listener */
-            rb_init(&self->can_instance->rx_msg_pool, NULL, 0U);
-            rb_init(&self->can_instance->rx_msg_queue, NULL, 0U);
+            rb_init(&can_instance->rx_msg_pool, NULL, 0U);
+            rb_init(&can_instance->rx_msg_queue, NULL, 0U);
 
             self->bitrate = (uint32_t)baudrate;
             self->can_instance->tx_busy = false;
