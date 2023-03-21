@@ -368,14 +368,14 @@ void common_hal_canio_can_construct(canio_can_obj_t *self,
             self->rx = rx;
 
             self->can_instance = can_instance;
-            can_instance->is_used = true;
+            self->can_instance->is_used = true;
 
             can_enable(can_instance);
             __can_init(self, __object_cb[instance_idx], baudrate, loopback, silent);
 
             /* RX buffer will be allocated in listener */
-            rb_init(&can_instance->rx_msg_pool, NULL, 0U);
-            rb_init(&can_instance->rx_msg_queue, NULL, 0U);
+            rb_init(&self->can_instance->rx_msg_pool, NULL, 0U);
+            rb_init(&self->can_instance->rx_msg_queue, NULL, 0U);
 
             self->bitrate = (uint32_t)baudrate;
             self->can_instance->tx_busy = false;
@@ -399,14 +399,14 @@ void common_hal_canio_can_deinit(canio_can_obj_t *self) {
         (void)can_drv->PowerControl(ARM_POWER_OFF);
         (void)can_drv->Uninitialize();
 
-        self->can_instance->is_used = false;
-        self->can_instance = (can_inst_t *)NULL;
-
         common_hal_reset_pin(self->tx);
         common_hal_reset_pin(self->rx);
 
         rb_deinit(&self->can_instance->rx_msg_pool);
         rb_deinit(&self->can_instance->rx_msg_queue);
+
+        self->can_instance->is_used = false;
+        self->can_instance = (can_inst_t *)NULL;
     }
 
     return;
