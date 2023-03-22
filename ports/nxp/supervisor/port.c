@@ -566,7 +566,7 @@ void RIT_IRQHandler(void) {
     uint32_t irqstatus = RIT_GetIntStatus();
 
     if (irqstatus) {
-        overflowed_ticks += (1UL << (32 - 5));
+        overflowed_ticks += (1UL << (32 - 17));
     }
 
     RIT_ClearInt();
@@ -676,10 +676,10 @@ uint64_t port_get_raw_ticks(uint8_t *subticks) {
     uint64_t overflow_count;
     uint64_t current_ticks = _get_count(&overflow_count);
     if (subticks != NULL) {
-        *subticks = (current_ticks % 32ULL);
+        *subticks = (current_ticks);
     }
 
-    return overflow_count + (current_ticks / 32ULL);
+    return overflow_count + (current_ticks);
 }
 #endif
 
