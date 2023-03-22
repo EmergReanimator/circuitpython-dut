@@ -321,11 +321,22 @@ STATIC int __can_init(canio_can_obj_t *self, object_cb_func cb, uint32_t baudrat
 
 void common_hal_canio_reset(void) {
     #if (1)
-    #if (1)
-    // TODO: Implement common_hal_canio_reset
-    #else
-    mp_raise_RuntimeError(translate("common_hal_canio_reset functionality is missing"));
-    #endif
+    for (size_t n = 0; n < CAN_INSTANCES_NUM; n++)
+    {
+        can_inst_t *instance = get_can_instance(n);
+        if (instance->is_used) {
+            reset_pin_number(NXP_PORT_GPIO_PIN_PORT(instance->pin_map->tx), NXP_PORT_GPIO_PIN_NUMBER(instance->pin_map->tx));
+            reset_pin_number(NXP_PORT_GPIO_PIN_PORT(instance->pin_map->rx), NXP_PORT_GPIO_PIN_NUMBER(instance->pin_map->rx));
+
+            instance->is_used = false;
+            ARM_DRIVER_CAN *can_drv = instance->driver;
+
+            if (can_drv) {
+                can_drv->PowerControl(ARM_POWER_OFF);
+                can_drv->Uninitialize();
+            }
+        }
+    }
 
     #else
     canio_can_obj_t *self = NULL;
